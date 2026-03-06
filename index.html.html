@@ -1,0 +1,2511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Freelance HQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --accent: #c8f135;
+    --accent2: #f1a335;
+    --text: #f0f0f0;
+    --muted: #666;
+    --red: #ff4d4d;
+    --green: #4dff91;
+    --blue: #4da6ff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* SIDEBAR */
+  .layout { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 240px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: fixed;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .logo {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .logo h1 {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .logo p { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 2px; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--muted);
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover { color: var(--text); background: var(--surface2); }
+  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(200,241,53,0.05); }
+  .nav-icon { font-size: 16px; }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .stats-mini { display: flex; flex-direction: column; gap: 8px; }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .stat-row span:first-child { color: var(--muted); }
+  .stat-row span:last-child { color: var(--accent); font-weight: 500; }
+
+  /* MAIN */
+  .main {
+    margin-left: 240px;
+    flex: 1;
+    padding: 32px;
+    max-width: calc(100vw - 240px);
+  }
+
+  /* TABS */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* PAGE HEADER */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+  }
+
+  .page-title { font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+  .page-sub { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 4px; }
+
+  /* BUTTONS */
+  .btn {
+    padding: 8px 18px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-primary:hover { background: #d9ff4a; transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+  .btn-danger { background: transparent; color: var(--red); border: 1px solid var(--red); font-size: 11px; padding: 4px 10px; }
+  .btn-danger:hover { background: var(--red); color: #fff; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.yellow::before { background: var(--accent); }
+  .stat-card.orange::before { background: var(--accent2); }
+  .stat-card.blue::before { background: var(--blue); }
+
+  .stat-card .label { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 1px; }
+  .stat-card .value { font-size: 32px; font-weight: 800; margin-top: 6px; letter-spacing: -2px; }
+  .stat-card.green .value { color: var(--green); }
+  .stat-card.yellow .value { color: var(--accent); }
+  .stat-card.orange .value { color: var(--accent2); }
+  .stat-card.blue .value { color: var(--blue); }
+
+  /* WORKFLOW CHECKLIST */
+  .workflow-section { margin-bottom: 28px; }
+  .section-title {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: all 0.2s;
+  }
+
+  .checklist-item:hover { border-color: var(--accent); }
+  .checklist-item.done { opacity: 0.5; }
+  .checklist-item.done .item-text { text-decoration: line-through; }
+
+  .check-box {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 10px;
+  }
+
+  .check-box:hover { border-color: var(--accent); }
+  .checklist-item.done .check-box { background: var(--accent); border-color: var(--accent); color: #000; }
+
+  .item-text { font-size: 13px; line-height: 1.5; flex: 1; }
+  .item-tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+    flex-shrink: 0;
+  }
+
+  .tag-free { background: rgba(77,255,145,0.1); color: var(--green); }
+  .tag-tool { background: rgba(200,241,53,0.1); color: var(--accent); }
+  .tag-action { background: rgba(241,163,53,0.1); color: var(--accent2); }
+  .tag-client { background: rgba(77,166,255,0.1); color: var(--blue); }
+
+  /* TOOLS GRID */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .tool-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .tool-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+  .tool-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .tool-name { font-size: 13px; font-weight: 600; }
+  .tool-desc { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: 'DM Mono', monospace; }
+
+  /* CRM TABLE */
+  .crm-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+
+  .crm-controls input, .crm-controls select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .crm-controls input:focus, .crm-controls select:focus { border-color: var(--accent); }
+  .crm-controls input { flex: 1; }
+
+  .crm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .crm-table th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .crm-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .crm-table tr:hover td { background: var(--surface2); }
+
+  .status-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+  }
+
+  .status-called { background: rgba(77,166,255,0.1); color: var(--blue); }
+  .status-interested { background: rgba(200,241,53,0.1); color: var(--accent); }
+  .status-closed { background: rgba(77,255,145,0.1); color: var(--green); }
+  .status-rejected { background: rgba(255,77,77,0.1); color: var(--red); }
+  .status-noreply { background: rgba(102,102,102,0.15); color: var(--muted); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    width: 480px;
+    max-width: 90vw;
+  }
+
+  .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+
+  .form-group { margin-bottom: 14px; }
+  .form-group label { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px; }
+
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* NOTES — RICH EDITOR */
+  .notes-layout { display: flex; gap: 0; height: calc(100vh - 160px); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+
+  .notes-list {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .notes-list-header {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .notes-list-header span { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 1px; }
+
+  .btn-new-note {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 5px;
+    padding: 4px 10px;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    font-weight: 700;
+    transition: background 0.2s;
+  }
+
+  .btn-new-note:hover { background: #d9ff4a; }
+
+  .notes-list-items { flex: 1; overflow-y: auto; }
+
+  .note-list-item {
+    padding: 12px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+    position: relative;
+  }
+
+  .note-list-item:hover { background: var(--surface2); }
+  .note-list-item.active { background: rgba(200,241,53,0.07); border-left: 3px solid var(--accent); }
+
+  .note-list-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .note-list-preview { font-size: 11px; color: var(--muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .note-list-date { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 4px; }
+
+  .note-list-del {
+    position: absolute;
+    top: 10px; right: 8px;
+    background: none;
+    border: none;
+    color: transparent;
+    cursor: pointer;
+    font-size: 12px;
+    transition: color 0.2s;
+  }
+
+  .note-list-item:hover .note-list-del { color: var(--muted); }
+  .note-list-del:hover { color: var(--red) !important; }
+
+  /* EDITOR AREA */
+  .editor-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #111;
+    min-width: 0;
+  }
+
+  .editor-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 12px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .toolbar-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    margin: 0 4px;
+    flex-shrink: 0;
+  }
+
+  .tb-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px 7px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: 'Syne', sans-serif;
+    transition: all 0.15s;
+    line-height: 1;
+    min-width: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tb-btn:hover { background: var(--surface2); color: var(--text); }
+  .tb-btn.active { background: rgba(200,241,53,0.15); color: var(--accent); }
+
+  .tb-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .tb-color {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    padding: 0;
+    background: none;
+    overflow: hidden;
+  }
+
+  .tb-color input[type=color] {
+    width: 32px;
+    height: 32px;
+    border: none;
+    cursor: pointer;
+    margin: -4px;
+    background: none;
+  }
+
+  .editor-title-bar {
+    padding: 12px 20px 0;
+    background: #111;
+  }
+
+  .editor-title-input {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    outline: none;
+    letter-spacing: -0.5px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+
+  .editor-title-input::placeholder { color: var(--muted); }
+
+  .editor-body {
+    flex: 1;
+    padding: 16px 20px;
+    overflow-y: auto;
+    outline: none;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+  }
+
+  .editor-body:empty::before {
+    content: 'Start typing your note...';
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .editor-body h1 { font-size: 28px; font-weight: 800; margin: 12px 0 8px; }
+  .editor-body h2 { font-size: 22px; font-weight: 700; margin: 10px 0 6px; }
+  .editor-body h3 { font-size: 18px; font-weight: 600; margin: 8px 0 4px; }
+  .editor-body ul, .editor-body ol { padding-left: 24px; margin: 8px 0; }
+  .editor-body li { margin: 4px 0; }
+  .editor-body blockquote { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--muted); margin: 10px 0; }
+  .editor-body a { color: var(--blue); }
+  .editor-body table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  .editor-body td, .editor-body th { border: 1px solid var(--border); padding: 6px 10px; }
+  .editor-body th { background: var(--surface); }
+  .editor-body code { background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: 12px; }
+
+  .editor-statusbar {
+    padding: 6px 20px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .notes-empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+  }
+
+  .notes-empty .emoji { font-size: 36px; }
+
+  /* PORTFOLIO */
+  .portfolio-header-bar {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+  }
+  .portfolio-meta {
+    display: flex; gap: 20px; margin-bottom: 24px;
+  }
+  .portfolio-meta-item {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 20px; text-align: center;
+  }
+  .portfolio-meta-item .pm-val { font-size: 24px; font-weight: 800; color: var(--accent); letter-spacing: -1px; }
+  .portfolio-meta-item .pm-label { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+  .niche-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  .niche-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .niche-card:hover { border-color: var(--accent); }
+
+  .niche-card-header {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .niche-icon { font-size: 20px; }
+  .niche-name { font-size: 14px; font-weight: 700; flex: 1; }
+  .niche-progress-badge {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(200,241,53,0.1);
+    color: var(--accent);
+  }
+  .niche-progress-badge.done { background: rgba(77,255,145,0.1); color: var(--green); }
+
+  .niche-card-body { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+
+  .template-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--surface2);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .template-check {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+    transition: all 0.2s;
+  }
+  .template-check:hover { border-color: var(--accent); }
+  .template-check.checked { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
+
+  .template-label { font-size: 12px; flex: 1; color: var(--muted); }
+  .template-label.done { color: var(--text); }
+
+  .template-link-input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 4px 8px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    width: 140px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .template-link-input:focus { border-color: var(--accent); }
+  .template-link-input::placeholder { color: var(--muted); }
+
+  .template-link-btn {
+    background: none;
+    border: none;
+    color: var(--blue);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 2px;
+    text-decoration: none;
+    display: flex; align-items: center;
+  }
+  .template-link-btn:hover { color: var(--accent); }
+  .template-link-btn.disabled { color: var(--muted); cursor: default; pointer-events: none; }
+
+  /* WORKFLOW PANELS */
+  .setup-task-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 8px; transition: border-color 0.2s;
+  }
+  .setup-task-row:hover { border-color: var(--accent); }
+  .setup-task-row.done { opacity: 0.55; }
+  .setup-task-row.done .setup-task-text { text-decoration: line-through; color: var(--muted); }
+
+  .setup-check {
+    width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px;
+    cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; transition: all 0.2s;
+  }
+  .setup-check:hover { border-color: var(--accent); }
+  .setup-check.checked { background: var(--accent); border-color: var(--accent); color: #000; }
+
+  .setup-task-text { font-size: 13px; flex: 1; }
+
+  .del-task-btn {
+    background: none; border: none; color: transparent; cursor: pointer;
+    font-size: 13px; transition: color 0.2s; padding: 0 2px;
+  }
+  .setup-task-row:hover .del-task-btn { color: var(--muted); }
+  .del-task-btn:hover { color: var(--red) !important; }
+
+  .reminder-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 12px 14px;
+    background: var(--surface); border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0; margin-bottom: 8px;
+    border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  }
+  .reminder-bullet { color: var(--accent); font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .reminder-text { font-size: 13px; line-height: 1.5; flex: 1; color: var(--text); }
+  .del-reminder-btn {
+    background: none; border: none; color: transparent; cursor: pointer;
+    font-size: 13px; transition: color 0.2s; padding: 0 2px; flex-shrink: 0;
+  }
+  .reminder-row:hover .del-reminder-btn { color: var(--muted); }
+  .del-reminder-btn:hover { color: var(--red) !important; }
+
+  /* PROGRESS BAR */
+  .progress-wrap { margin-bottom: 6px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 11px; font-family: 'DM Mono', monospace; color: var(--muted); margin-bottom: 6px; }
+  .progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.5s ease; }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+  }
+
+  .empty-state .emoji { font-size: 32px; display: block; margin-bottom: 12px; }
+
+  /* A/B TESTING */
+  .ab-rule-banner {
+    background: rgba(77,166,255,0.07);
+    border: 1px solid rgba(77,166,255,0.2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    color: var(--blue);
+    font-family: 'DM Mono', monospace;
+    line-height: 1.7;
+  }
+  .ab-rule-banner strong { color: var(--text); }
+
+  .ab-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px; }
+
+  .ab-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .ab-card.active-msg { border-color: var(--accent); }
+  .ab-card.winner-msg { border-color: var(--green); }
+  .ab-card.retired-msg { opacity: 0.5; }
+
+  .ab-card-header {
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .ab-version-badge {
+    font-size: 13px; font-weight: 800;
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-family: 'DM Mono', monospace;
+  }
+  .ab-card-title { font-size: 13px; font-weight: 700; flex: 1; }
+  .ab-status-tag {
+    font-size: 10px; padding: 2px 8px; border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+  }
+  .ab-status-active { background: rgba(200,241,53,0.15); color: var(--accent); }
+  .ab-status-winner { background: rgba(77,255,145,0.15); color: var(--green); }
+  .ab-status-retired { background: rgba(102,102,102,0.15); color: var(--muted); }
+  .ab-status-testing { background: rgba(77,166,255,0.15); color: var(--blue); }
+
+  .ab-card-body { padding: 14px 16px; }
+
+  .ab-message-preview {
+    font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace;
+    line-height: 1.6; margin-bottom: 14px;
+    padding: 10px; background: var(--surface2); border-radius: 6px;
+    max-height: 80px; overflow: hidden;
+    position: relative;
+  }
+  .ab-message-preview::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 24px;
+    background: linear-gradient(transparent, var(--surface2));
+  }
+
+  .ab-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+
+  .ab-stat {
+    text-align: center;
+    padding: 8px 4px;
+    background: var(--surface2);
+    border-radius: 6px;
+  }
+  .ab-stat .ab-stat-val {
+    font-size: 16px; font-weight: 800;
+    font-family: 'DM Mono', monospace;
+  }
+  .ab-stat .ab-stat-label {
+    font-size: 9px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  .ab-pct-bar {
+    margin-bottom: 6px;
+  }
+  .ab-pct-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 10px; font-family: 'DM Mono', monospace;
+    color: var(--muted); margin-bottom: 3px;
+  }
+  .ab-pct-val { font-weight: 700; font-size: 11px; }
+  .ab-bar { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .ab-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+
+  .ab-card-actions {
+    display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap;
+  }
+  .ab-action-btn {
+    font-size: 10px; padding: 4px 10px; border-radius: 5px; border: 1px solid var(--border);
+    background: none; color: var(--muted); cursor: pointer;
+    font-family: 'Syne', sans-serif; transition: all 0.15s;
+  }
+  .ab-action-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .ab-action-btn.set-active { border-color: var(--accent); color: var(--accent); }
+  .ab-action-btn.set-winner { border-color: var(--green); color: var(--green); }
+  .ab-action-btn.retire { border-color: var(--red); color: var(--red); }
+
+  /* CRM FOLLOWUP */
+  .followup-banner {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 8px; margin-bottom: 4px;
+    font-size: 11px; font-family: 'DM Mono', monospace;
+  }
+  .followup-unseen { background: rgba(255,77,77,0.1); color: var(--red); border: 1px solid rgba(255,77,77,0.2); }
+  .followup-seen { background: rgba(241,163,53,0.1); color: var(--accent2); border: 1px solid rgba(241,163,53,0.2); }
+  .followup-max { background: rgba(102,102,102,0.1); color: var(--muted); border: 1px solid var(--border); }
+
+  .msg-count-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 10px; font-family: 'DM Mono', monospace;
+    padding: 2px 7px; border-radius: 20px;
+    background: rgba(77,166,255,0.1); color: var(--blue);
+  }
+
+  /* CLIENTS TAB */
+  .clients-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  .client-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+  .client-card:hover { border-color: var(--green); transform: translateY(-2px); }
+
+  .client-card-top {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .client-avatar {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--green), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800; color: #000;
+    flex-shrink: 0;
+  }
+  .client-name { font-size: 14px; font-weight: 700; }
+  .client-country { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .closed-badge {
+    margin-left: auto; font-size: 10px; padding: 3px 8px;
+    background: rgba(77,255,145,0.12); color: var(--green);
+    border-radius: 20px; font-family: 'DM Mono', monospace;
+    border: 1px solid rgba(77,255,145,0.2);
+  }
+
+  .client-card-body { padding: 12px 16px; }
+  .client-meta-row {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .client-meta-tag {
+    font-size: 10px; padding: 2px 8px; border-radius: 4px;
+    background: var(--surface2); color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .client-steps-preview {
+    font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace;
+  }
+  .step-mini-row {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .step-mini-row:last-child { border-bottom: none; }
+  .step-mini-check {
+    width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid var(--border);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 8px; cursor: pointer; transition: all 0.15s;
+  }
+  .step-mini-check:hover { border-color: var(--green); }
+  .step-mini-check.done { background: var(--green); border-color: var(--green); color: #000; }
+  .step-mini-text { font-size: 11px; flex: 1; }
+  .step-mini-text.done { text-decoration: line-through; color: var(--muted); }
+
+  /* CLIENT PROFILE MODAL */
+  .client-profile-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8); z-index: 2000;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(6px);
+  }
+  .client-profile-overlay.open { display: flex; }
+
+  .client-profile-modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 680px; max-width: 95vw;
+    max-height: 88vh;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+
+  .client-profile-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 14px;
+    background: var(--surface2);
+  }
+  .client-profile-avatar {
+    width: 52px; height: 52px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--green), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 800; color: #000;
+  }
+  .client-profile-name { font-size: 20px; font-weight: 800; }
+  .client-profile-sub { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 3px; }
+  .client-profile-close {
+    margin-left: auto; background: none; border: none;
+    color: var(--muted); font-size: 20px; cursor: pointer;
+    transition: color 0.15s; padding: 4px 8px; border-radius: 6px;
+  }
+  .client-profile-close:hover { color: var(--red); background: rgba(255,77,77,0.1); }
+
+  .client-profile-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; }
+
+  .client-info-grid {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
+  }
+  .client-info-item { background: var(--surface2); border-radius: 8px; padding: 10px 14px; }
+  .client-info-label { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .client-info-val { font-size: 13px; font-weight: 600; }
+
+  .client-steps-section { }
+  .client-steps-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+  }
+
+  .step-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 8px;
+    transition: border-color 0.15s;
+  }
+  .step-row:hover { border-color: var(--green); }
+  .step-check {
+    width: 18px; height: 18px; border: 2px solid var(--border);
+    border-radius: 4px; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; transition: all 0.15s;
+  }
+  .step-check:hover { border-color: var(--green); }
+  .step-check.done { background: var(--green); border-color: var(--green); color: #000; }
+  .step-text { flex: 1; font-size: 13px; }
+  .step-text.done { text-decoration: line-through; color: var(--muted); }
+  .step-priority {
+    font-size: 9px; padding: 2px 7px; border-radius: 20px;
+    font-family: 'DM Mono', monospace; flex-shrink: 0;
+  }
+  .priority-urgent { background: rgba(255,77,77,0.1); color: var(--red); }
+  .priority-normal { background: rgba(77,166,255,0.1); color: var(--blue); }
+  .priority-low    { background: rgba(102,102,102,0.1); color: var(--muted); }
+  .del-step-btn {
+    background: none; border: none; color: transparent;
+    cursor: pointer; font-size: 12px; transition: color 0.15s;
+  }
+  .step-row:hover .del-step-btn { color: var(--muted); }
+  .del-step-btn:hover { color: var(--red) !important; }
+
+  .client-notes-area {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 14px;
+    font-size: 13px; color: var(--text); font-family: 'Syne', sans-serif;
+    resize: vertical; min-height: 80px; width: 100%; outline: none;
+    transition: border-color 0.2s;
+  }
+  .client-notes-area:focus { border-color: var(--accent); }
+
+  /* ADD STEP POPUP */
+  .step-popup-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); z-index: 3000;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .step-popup-overlay.open { display: flex; }
+  .step-popup {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px; width: 440px; max-width: 92vw;
+  }
+  .step-popup h4 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+
+  @media (max-width: 768px) {
+    .clients-grid { grid-template-columns: 1fr; }
+    .client-info-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h1>FreelanceHQ</h1>
+      <p>BD → US/EU</p>
+    </div>
+    <nav>
+      <div class="nav-item active" onclick="switchTab('dashboard')">
+        <span class="nav-icon">⚡</span>
+        <span>Dashboard</span>
+      </div>
+      <div class="nav-item" onclick="switchTab('workflow')">
+        <span class="nav-icon">✅</span>
+        <span>Workflow</span>
+      </div>
+      <div class="nav-item" onclick="switchTab('tools')">
+        <span class="nav-icon">🛠️</span>
+        <span>Tools</span>
+      </div>
+      <div class="nav-item" onclick="switchTab('crm')">
+        <span class="nav-icon">📞</span>
+        <span>CRM Tracker</span>
+      </div>
+      <div class="nav-item" onclick="switchTab('notes')">
+        <span class="nav-icon">📝</span>
+        <span>Notes</span>
+      </div>
+      <div class="nav-item" onclick="switchTab('portfolio')">
+        <span class="nav-icon">🌐</span>
+        <span>Portfolio</span>
+      </div>
+      <div class="nav-item" onclick="switchTab('abtest')">
+        <span class="nav-icon">🧪</span>
+        <span>A/B Testing</span>
+      </div>
+      <div class="nav-item" onclick="switchTab('clients')">
+        <span class="nav-icon">💰</span>
+        <span>Clients</span>
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="stats-mini" id="sidebar-stats">
+        <div class="stat-row"><span>Total Calls</span><span id="sb-total">0</span></div>
+        <div class="stat-row"><span>Closed</span><span id="sb-closed">0</span></div>
+        <div class="stat-row"><span>Rate</span><span id="sb-rate">0%</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="tab-content active" id="tab-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-sub">Your freelance operation overview</div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card yellow">
+          <div class="label">Total Reached</div>
+          <div class="value" id="stat-total">0</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="label">Interested</div>
+          <div class="value" id="stat-interested">0</div>
+        </div>
+        <div class="stat-card green">
+          <div class="label">Closed 💰</div>
+          <div class="value" id="stat-closed">0</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="label">Close Rate</div>
+          <div class="value" id="stat-rate">0%</div>
+        </div>
+        <div class="stat-card" style="border-top:2px solid #c8f135;">
+          <div class="label">System</div>
+          <div class="value" id="stat-system" style="color:var(--accent);">0%</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Progress to First Client</div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>Cold Outreach Goal</span><span id="prog-label">0 / 800</span></div>
+          <div class="progress-bar"><div class="progress-fill" id="prog-bar" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(200,241,53,0.3);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div>
+            <div style="font-size:14px;font-weight:700;">⚙️ System Readiness</div>
+            <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px;">Setup tasks + Portfolio websites combined</div>
+          </div>
+          <div style="font-size:28px;font-weight:800;color:var(--accent);" id="sys-big-pct">0%</div>
+        </div>
+        <div class="progress-wrap" style="margin-bottom:10px;">
+          <div class="progress-label"><span>Setup Tasks</span><span id="sys-setup-label">0 / 0</span></div>
+          <div class="progress-bar"><div class="progress-fill" id="sys-setup-bar" style="width:0%;background:var(--blue);"></div></div>
+        </div>
+        <div class="progress-wrap" style="margin-bottom:0;">
+          <div class="progress-label"><span>Portfolio Websites</span><span id="sys-portfolio-label">0 / 36</span></div>
+          <div class="progress-bar"><div class="progress-fill" id="sys-portfolio-bar" style="width:0%;background:var(--green);"></div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;" id="sys-message">
+          System not ready yet — complete setup tasks and build portfolio websites.
+        </div>
+      </div>
+
+      <div class="section-title">Business Info</div>
+      <div class="card">
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+          <div>
+            <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Business Type</div>
+            <div style="font-size:14px;font-weight:600;">Service Based</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Domain</div>
+            <div style="font-size:14px;font-weight:600;">Website Building</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Target Clients</div>
+            <div style="font-size:14px;font-weight:600;">🇺🇸 US + 🇪🇺 Europe</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORKFLOW -->
+    <div class="tab-content" id="tab-workflow">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Workflow</div>
+          <div class="page-sub">One-time setup on the left — daily mindset on the right</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+        <!-- LEFT: ONE-TIME SETUP TASKS -->
+        <div>
+          <div class="section-title">⚙️ System Setup <span style="color:var(--accent);margin-left:8px;" id="setup-count-label"></span></div>
+          <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:12px;">These count toward your System % on Dashboard</div>
+
+          <div id="setup-tasks-list"></div>
+
+          <!-- Add new task -->
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <input id="new-setup-input" type="text" placeholder="Add a setup task..." style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:12px;outline:none;" onkeydown="if(event.key==='Enter')addSetupTask()">
+            <button class="btn btn-primary" style="padding:8px 14px;font-size:12px;" onclick="addSetupTask()">+ Add</button>
+          </div>
+        </div>
+
+        <!-- RIGHT: DAILY REMINDERS -->
+        <div>
+          <div class="section-title">📅 Daily Reminders</div>
+          <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:12px;">Guiding principles — not checkboxes. Read every day.</div>
+
+          <div id="daily-reminders-list"></div>
+
+          <!-- Add new reminder -->
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <input id="new-reminder-input" type="text" placeholder="Add a daily reminder..." style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:12px;outline:none;" onkeydown="if(event.key==='Enter')addDailyReminder()">
+            <button class="btn btn-primary" style="padding:8px 14px;font-size:12px;" onclick="addDailyReminder()">+ Add</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TOOLS -->
+    <div class="tab-content" id="tab-tools">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Tools</div>
+          <div class="page-sub">Your zero-investment tech stack</div>
+        </div>
+      </div>
+
+      <div class="section-title">Free Website Builders (AI)</div>
+      <div class="tools-grid" id="tools-builders"></div>
+
+      <div class="section-title">Free Hosting</div>
+      <div class="tools-grid" id="tools-hosting"></div>
+
+      <div class="section-title">Payment</div>
+      <div class="tools-grid" id="tools-payment"></div>
+    </div>
+
+    <!-- CRM -->
+    <div class="tab-content" id="tab-crm">
+      <div class="page-header">
+        <div>
+          <div class="page-title">CRM Tracker</div>
+          <div class="page-sub">Track every outreach — follow up logic built in</div>
+        </div>
+        <button class="btn btn-primary" onclick="openModal()">+ Add Contact</button>
+      </div>
+
+      <div class="ab-rule-banner">
+        <strong>📋 Follow-up Rules:</strong> Max 3 messages per person. &nbsp;|&nbsp;
+        <strong>Not seen after 7 days</strong> → send again with a NEW message. &nbsp;|&nbsp;
+        <strong>Seen but no reply after 14 days</strong> → follow up again. &nbsp;|&nbsp;
+        <strong>Still no reply after 28 days</strong> → final message, then mark Dead. &nbsp;|&nbsp;
+        Never send the same message twice to the same person.
+      </div>
+
+      <div id="followup-due-section"></div>
+
+      <div class="crm-controls">
+        <input type="text" placeholder="Search business name..." oninput="filterCRM(this.value)" id="crm-search">
+        <select onchange="filterByStatus(this.value)" id="status-filter">
+          <option value="">All Status</option>
+          <option value="called">Called</option>
+          <option value="seen">Seen</option>
+          <option value="interested">Interested</option>
+          <option value="closed">Closed ✅</option>
+          <option value="rejected">Rejected</option>
+          <option value="noreply">No Reply</option>
+          <option value="dead">Dead 🚫</option>
+        </select>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="crm-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Business</th>
+              <th>Country</th>
+              <th>Contact</th>
+              <th>Message Sent</th>
+              <th>Msgs</th>
+              <th>Status</th>
+              <th>Due</th>
+              <th>Date</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="crm-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="tab-content" id="tab-notes">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Notes</div>
+          <div class="page-sub">Full rich text editor — like Google Docs</div>
+        </div>
+      </div>
+
+      <div class="notes-layout">
+        <!-- LEFT: Notes List -->
+        <div class="notes-list">
+          <div class="notes-list-header">
+            <span>My Notes</span>
+            <button class="btn-new-note" onclick="newNote()" title="New Note">+</button>
+          </div>
+          <div class="notes-list-items" id="notes-list-items">
+            <div class="notes-empty" style="padding:40px 20px;text-align:center;">
+              <div class="emoji">📝</div>
+              <div>No notes yet</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Editor -->
+        <div class="editor-area" id="editor-area">
+          <div class="notes-empty" id="editor-empty">
+            <div class="emoji">✍️</div>
+            <div>Select a note or create a new one</div>
+          </div>
+
+          <div id="editor-main" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+            <!-- TOOLBAR -->
+            <div class="editor-toolbar">
+              <!-- Font Family -->
+              <select class="tb-select" onchange="execCmd('fontName', this.value)" title="Font">
+                <option value="Syne, sans-serif">Syne</option>
+                <option value="Georgia, serif">Georgia</option>
+                <option value="'DM Mono', monospace">Mono</option>
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'Times New Roman', serif">Times</option>
+                <option value="'Courier New', monospace">Courier</option>
+              </select>
+
+              <!-- Font Size -->
+              <select class="tb-select" onchange="execCmd('fontSize', this.value)" title="Size">
+                <option value="1">10</option>
+                <option value="2">13</option>
+                <option value="3" selected>16</option>
+                <option value="4">18</option>
+                <option value="5">24</option>
+                <option value="6">32</option>
+                <option value="7">48</option>
+              </select>
+
+              <div class="toolbar-sep"></div>
+
+              <!-- Headings -->
+              <select class="tb-select" onchange="applyHeading(this.value); this.value=''" title="Heading">
+                <option value="">Style</option>
+                <option value="H1">Heading 1</option>
+                <option value="H2">Heading 2</option>
+                <option value="H3">Heading 3</option>
+                <option value="P">Normal</option>
+              </select>
+
+              <div class="toolbar-sep"></div>
+
+              <!-- Format -->
+              <button class="tb-btn" onclick="execCmd('bold')" title="Bold"><b>B</b></button>
+              <button class="tb-btn" onclick="execCmd('italic')" title="Italic"><i>I</i></button>
+              <button class="tb-btn" onclick="execCmd('underline')" title="Underline"><u>U</u></button>
+              <button class="tb-btn" onclick="execCmd('strikeThrough')" title="Strikethrough"><s>S</s></button>
+
+              <div class="toolbar-sep"></div>
+
+              <!-- Colors -->
+              <div class="tb-color" title="Text Color">
+                <input type="color" value="#f0f0f0" oninput="execCmd('foreColor', this.value)" title="Text Color">
+              </div>
+              <div class="tb-color" title="Highlight Color">
+                <input type="color" value="#c8f135" oninput="execCmd('hiliteColor', this.value)" title="Highlight">
+              </div>
+
+              <div class="toolbar-sep"></div>
+
+              <!-- Alignment -->
+              <button class="tb-btn" onclick="execCmd('justifyLeft')" title="Align Left">⬅</button>
+              <button class="tb-btn" onclick="execCmd('justifyCenter')" title="Center">↔</button>
+              <button class="tb-btn" onclick="execCmd('justifyRight')" title="Align Right">➡</button>
+              <button class="tb-btn" onclick="execCmd('justifyFull')" title="Justify">☰</button>
+
+              <div class="toolbar-sep"></div>
+
+              <!-- Lists -->
+              <button class="tb-btn" onclick="execCmd('insertUnorderedList')" title="Bullet List">• List</button>
+              <button class="tb-btn" onclick="execCmd('insertOrderedList')" title="Numbered List">1. List</button>
+
+              <div class="toolbar-sep"></div>
+
+              <!-- Indent -->
+              <button class="tb-btn" onclick="execCmd('indent')" title="Indent">→|</button>
+              <button class="tb-btn" onclick="execCmd('outdent')" title="Outdent">|←</button>
+
+              <div class="toolbar-sep"></div>
+
+              <!-- Insert -->
+              <button class="tb-btn" onclick="insertHR()" title="Divider">—</button>
+              <button class="tb-btn" onclick="insertLink()" title="Insert Link">🔗</button>
+              <button class="tb-btn" onclick="insertCode()" title="Code Block">&lt;/&gt;</button>
+              <button class="tb-btn" onclick="insertTable()" title="Insert Table">⊞</button>
+
+              <div class="toolbar-sep"></div>
+
+              <!-- Undo/Redo -->
+              <button class="tb-btn" onclick="execCmd('undo')" title="Undo">↩</button>
+              <button class="tb-btn" onclick="execCmd('redo')" title="Redo">↪</button>
+
+              <div class="toolbar-sep"></div>
+
+              <!-- Clear -->
+              <button class="tb-btn" onclick="execCmd('removeFormat')" title="Clear Formatting" style="font-size:11px;">Clear Fmt</button>
+            </div>
+
+            <!-- Title -->
+            <div class="editor-title-bar">
+              <input class="editor-title-input" id="editor-title" placeholder="Note title..." oninput="saveCurrentNote()">
+            </div>
+
+            <!-- Body -->
+            <div class="editor-body" id="editor-body" contenteditable="true" oninput="saveCurrentNote(); updateStatusBar()" onkeyup="updateStatusBar()"></div>
+
+            <!-- Status Bar -->
+            <div class="editor-statusbar">
+              <span id="editor-words">0 words</span>
+              <span id="editor-chars">0 chars</span>
+              <span id="editor-saved">✓ Auto-saved</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PORTFOLIO -->
+    <div class="tab-content" id="tab-portfolio">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Portfolio Tracker</div>
+          <div class="page-sub">12 niches × 3 templates = 36 sample websites</div>
+        </div>
+      </div>
+
+      <div class="portfolio-meta">
+        <div class="portfolio-meta-item">
+          <div class="pm-val" id="pt-built">0</div>
+          <div class="pm-label">Built</div>
+        </div>
+        <div class="portfolio-meta-item">
+          <div class="pm-val" id="pt-live">0</div>
+          <div class="pm-label">Live Links</div>
+        </div>
+        <div class="portfolio-meta-item">
+          <div class="pm-val" id="pt-remaining">36</div>
+          <div class="pm-label">Remaining</div>
+        </div>
+        <div class="portfolio-meta-item">
+          <div class="pm-val" id="pt-percent">0%</div>
+          <div class="pm-label">Complete</div>
+        </div>
+      </div>
+
+      <div class="progress-wrap" style="margin-bottom:24px;">
+        <div class="progress-label"><span>Overall Portfolio Progress</span><span id="pt-prog-label">0 / 36</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="pt-prog-bar" style="width:0%"></div></div>
+      </div>
+
+      <div class="niche-grid" id="niche-grid"></div>
+    </div>
+
+    <!-- A/B TESTING -->
+    <div class="tab-content" id="tab-abtest">
+      <div class="page-header">
+        <div>
+          <div class="page-title">A/B Testing</div>
+          <div class="page-sub">Test message versions — find what makes people reply</div>
+        </div>
+        <button class="btn btn-primary" onclick="openABModal()">+ Add Message</button>
+      </div>
+
+      <div class="ab-rule-banner">
+        <strong>How it works:</strong> Add a message version → send it to 10+ people → track Seen & Replied manually in CRM contacts → stats update here automatically. When a version clearly wins, mark it as Winner and retire the others.
+      </div>
+
+      <div id="ab-cards-container">
+        <div class="empty-state"><span class="emoji">🧪</span>No message versions yet. Click "+ Add Message" to start testing.</div>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div class="tab-content" id="tab-clients">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Clients 💰</div>
+          <div class="page-sub">Every closed deal — all in one place</div>
+        </div>
+        <button class="btn btn-ghost" onclick="openStepsGuide()" id="steps-guide-btn">📋 See Steps</button>
+      </div>
+
+      <div id="clients-empty" style="display:none;">
+        <div class="empty-state"><span class="emoji">🤝</span>No clients yet. Close your first deal in CRM Tracker — it will appear here automatically.</div>
+      </div>
+
+      <div class="clients-grid" id="clients-grid"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- CLIENT PROFILE MODAL -->
+<div class="client-profile-overlay" id="client-profile-overlay">
+  <div class="client-profile-modal">
+    <div class="client-profile-header">
+      <div class="client-profile-avatar" id="cp-avatar">?</div>
+      <div>
+        <div class="client-profile-name" id="cp-name">—</div>
+        <div class="client-profile-sub" id="cp-sub">—</div>
+      </div>
+      <button class="client-profile-close" onclick="closeClientProfile()">✕</button>
+    </div>
+    <div class="client-profile-body">
+
+      <div class="client-info-grid" id="cp-info-grid"></div>
+
+      <div class="client-steps-section">
+        <div class="client-steps-header">
+          <div class="section-title" style="margin-bottom:0;">Post-Close Action Steps</div>
+          <button class="btn btn-primary" style="padding:6px 14px;font-size:12px;" onclick="openAddStep()">+ Add Step</button>
+        </div>
+        <div id="cp-steps-list"></div>
+      </div>
+
+      <div>
+        <div class="section-title">Private Notes</div>
+        <textarea class="client-notes-area" id="cp-notes" placeholder="Any notes about this client — payment details, special requests, testimonial received..." oninput="saveClientNotes()"></textarea>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ADD STEP POPUP -->
+<div class="step-popup-overlay" id="step-popup-overlay">
+  <div class="step-popup">
+    <h4>Add Action Step</h4>
+    <div class="form-group">
+      <label>Step Description</label>
+      <input type="text" id="step-input" placeholder="e.g. Send invoice to client" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;outline:none;">
+    </div>
+    <div class="form-group" style="margin-top:12px;">
+      <label>Priority</label>
+      <select id="step-priority" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;outline:none;">
+        <option value="urgent">🔴 Urgent</option>
+        <option value="normal" selected>🔵 Normal</option>
+        <option value="low">⚫ Low</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
+      <button class="btn btn-ghost" onclick="closeAddStep()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNewStep()">Add Step</button>
+    </div>
+  </div>
+</div>
+
+<!-- STEPS GUIDE POPUP -->
+<div class="step-popup-overlay" id="steps-guide-overlay">
+  <div class="step-popup" style="width:520px;">
+    <h4>📋 Post-Close Checklist Guide</h4>
+    <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:14px;">These steps are added automatically to every new client profile.</div>
+    <div id="steps-guide-list"></div>
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <input id="guide-step-input" type="text" placeholder="Add a default step..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:12px;outline:none;" onkeydown="if(event.key==='Enter')addGuideStep()">
+      <button class="btn btn-primary" style="padding:8px 14px;font-size:12px;" onclick="addGuideStep()">+ Add</button>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px;">
+      <button class="btn btn-ghost" onclick="closeStepsGuide()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT CONTACT MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal" style="width:560px;max-height:90vh;overflow-y:auto;">
+    <h3 id="modal-title">Add New Contact</h3>
+    <input type="hidden" id="f-edit-id">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Business Name</label>
+        <input type="text" id="f-name" placeholder="Joe's Pizza">
+      </div>
+      <div class="form-group">
+        <label>Country</label>
+        <select id="f-country">
+          <option value="🇺🇸 US">🇺🇸 US</option>
+          <option value="🇬🇧 UK">🇬🇧 UK</option>
+          <option value="🇩🇪 Germany">🇩🇪 Germany</option>
+          <option value="🇫🇷 France">🇫🇷 France</option>
+          <option value="🇳🇱 Netherlands">🇳🇱 Netherlands</option>
+          <option value="🇦🇺 Australia">🇦🇺 Australia</option>
+          <option value="🇧🇩 Bangladesh">🇧🇩 Bangladesh</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Contact (WhatsApp / Instagram / Email)</label>
+      <input type="text" id="f-contact" placeholder="+1 555 000 0000">
+    </div>
+
+    <!-- MESSAGE SELECTION -->
+    <div class="form-group">
+      <label>Message Version Sent</label>
+      <div id="f-msg-selector" style="display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;"></div>
+      <div id="f-msg-warning" style="display:none;margin-top:6px;padding:8px 10px;background:rgba(255,77,77,0.1);border:1px solid rgba(255,77,77,0.3);border-radius:6px;font-size:11px;color:var(--red);font-family:'DM Mono',monospace;">
+        ⚠️ This is the same message you sent before! Please select a different version for follow-ups.
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Status</label>
+        <select id="f-status">
+          <option value="called">Called / Sent</option>
+          <option value="seen">Seen ✓</option>
+          <option value="interested">Interested 🔥</option>
+          <option value="closed">Closed 💰</option>
+          <option value="rejected">Rejected</option>
+          <option value="noreply">No Reply</option>
+          <option value="dead">Dead 🚫</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="f-date">
+      </div>
+    </div>
+
+    <!-- SEEN / REPLIED — manual update -->
+    <div class="form-row">
+      <div class="form-group" style="display:flex;align-items:center;gap:10px;background:var(--surface2);padding:10px 14px;border-radius:8px;border:1px solid var(--border);">
+        <input type="checkbox" id="f-seen" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;">
+        <label style="font-size:12px;color:var(--text);text-transform:none;letter-spacing:0;cursor:pointer;" for="f-seen">They <strong>saw</strong> the message</label>
+      </div>
+      <div class="form-group" style="display:flex;align-items:center;gap:10px;background:var(--surface2);padding:10px 14px;border-radius:8px;border:1px solid var(--border);">
+        <input type="checkbox" id="f-replied" style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;">
+        <label style="font-size:12px;color:var(--text);text-transform:none;letter-spacing:0;cursor:pointer;" for="f-replied">They <strong>replied</strong></label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea id="f-notes" placeholder="What happened..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveContact()">Save Contact</button>
+    </div>
+  </div>
+</div>
+
+<!-- AB TEST ADD MESSAGE MODAL -->
+<div class="modal-overlay" id="ab-modal">
+  <div class="modal" style="width:520px;">
+    <h3>Add Message Version</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Version Title</label>
+        <input type="text" id="ab-title" placeholder="e.g. Version A — Direct Offer">
+      </div>
+      <div class="form-group">
+        <label>Platform</label>
+        <select id="ab-platform">
+          <option>Instagram DM</option>
+          <option>Facebook DM</option>
+          <option>Email</option>
+          <option>LinkedIn</option>
+          <option>Yelp Message</option>
+          <option>Twitter DM</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Full Message Text</label>
+      <textarea id="ab-body" style="min-height:120px;" placeholder="Paste the full message you send to prospects..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeABModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveABMessage()">Add Message</button>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+// ── DATA ──────────────────────────────────────────────
+let contacts   = JSON.parse(localStorage.getItem('crm')        || '[]');
+let notes      = JSON.parse(localStorage.getItem('notes')      || '[]');
+let abMessages = JSON.parse(localStorage.getItem('abMessages') || '[]');
+
+// ── SETUP TASKS ────────────────────────────────────────
+const defaultSetupTasks = [
+  { id:'su1', text:'Create account on Carrd.co (free website builder)', done:false },
+  { id:'su2', text:'Create account on Netlify and test first deploy', done:false },
+  { id:'su3', text:'Set up GitHub account and push first repo', done:false },
+  { id:'su4', text:'Email Payoneer support to fix account issue', done:false },
+  { id:'su5', text:'Set up Binance P2P as backup payment method', done:false },
+  { id:'su6', text:'Link City Bank account to Payoneer or Binance', done:false },
+  { id:'su7', text:'Write cold DM script and save in Notes tab', done:false },
+  { id:'su8', text:'Create LinkedIn profile with professional bio', done:false },
+  { id:'su9', text:'Set up Instagram business account for outreach', done:false },
+];
+const defaultDailyReminders = [
+  'Send at least 9 DMs or messages per day — no excuses.',
+  'Morning time = quality work. Build websites, improve samples.',
+  'Night time = outreach. Search Google Maps, Yelp, Instagram.',
+  'Log every single person you contact in the CRM Tracker.',
+  'Follow up anyone who showed interest the day before.',
+  'Goal: 800 total outreaches in 3 months. That is your only job.',
+  'System ready + consistent outreach = clients will come.',
+];
+let setupTasks     = JSON.parse(localStorage.getItem('setupTasks')     || JSON.stringify(defaultSetupTasks));
+let dailyReminders = JSON.parse(localStorage.getItem('dailyReminders') || JSON.stringify(defaultDailyReminders));
+function saveSetupTasks()     { localStorage.setItem('setupTasks',     JSON.stringify(setupTasks));     }
+function saveDailyReminders() { localStorage.setItem('dailyReminders', JSON.stringify(dailyReminders)); }
+
+// ── INIT ───────────────────────────────────────────────
+function init() {
+  renderSetupTasks(); renderDailyReminders(); renderTools();
+  renderCRM(contacts); renderNotes(); renderABCards(); renderClients();
+  updateStats();
+  document.getElementById('f-date').valueAsDate = new Date();
+}
+
+// ── TABS ───────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ── WORKFLOW ───────────────────────────────────────────
+function renderSetupTasks() {
+  const container = document.getElementById('setup-tasks-list');
+  const doneCount = setupTasks.filter(t => t.done).length;
+  document.getElementById('setup-count-label').textContent = `${doneCount}/${setupTasks.length} done`;
+  container.innerHTML = setupTasks.map((task, i) => `
+    <div class="setup-task-row ${task.done ? 'done' : ''}">
+      <div class="setup-check ${task.done ? 'checked' : ''}" onclick="toggleSetupTask(${i})">${task.done ? '✓' : ''}</div>
+      <span class="setup-task-text">${task.text}</span>
+      <button class="del-task-btn" onclick="deleteSetupTask(${i})">✕</button>
+    </div>`).join('');
+  updateSystemProgress();
+}
+function toggleSetupTask(i) { setupTasks[i].done = !setupTasks[i].done; saveSetupTasks(); renderSetupTasks(); }
+function deleteSetupTask(i) { setupTasks.splice(i, 1); saveSetupTasks(); renderSetupTasks(); }
+function addSetupTask() {
+  const input = document.getElementById('new-setup-input');
+  const text = input.value.trim(); if (!text) return;
+  setupTasks.push({ id: 'su' + Date.now(), text, done: false });
+  saveSetupTasks(); renderSetupTasks(); input.value = '';
+}
+function renderDailyReminders() {
+  const container = document.getElementById('daily-reminders-list');
+  container.innerHTML = dailyReminders.map((r, i) => `
+    <div class="reminder-row">
+      <span class="reminder-bullet">→</span>
+      <span class="reminder-text">${r}</span>
+      <button class="del-reminder-btn" onclick="deleteReminder(${i})">✕</button>
+    </div>`).join('');
+}
+function deleteReminder(i) { dailyReminders.splice(i, 1); saveDailyReminders(); renderDailyReminders(); }
+function addDailyReminder() {
+  const input = document.getElementById('new-reminder-input');
+  const text = input.value.trim(); if (!text) return;
+  dailyReminders.push(text); saveDailyReminders(); renderDailyReminders(); input.value = '';
+}
+
+// ── SYSTEM PROGRESS ────────────────────────────────────
+function updateSystemProgress() {
+  const setupDone  = setupTasks.filter(t => t.done).length;
+  const setupTotal = setupTasks.length;
+  let portfolioBuilt = 0;
+  if (typeof nichesData !== 'undefined') {
+    nichesData.forEach(n => n.templates.forEach((_, i) => {
+      if ((portfolioData[`${n.id}_t${i}`] || {}).built) portfolioBuilt++;
+    }));
+  }
+  const setupPct     = setupTotal ? Math.round((setupDone / setupTotal) * 100) : 0;
+  const portfolioPct = Math.round((portfolioBuilt / 36) * 100);
+  const overallPct   = Math.round((setupPct + portfolioPct) / 2);
+  document.getElementById('sys-setup-bar').style.width      = setupPct + '%';
+  document.getElementById('sys-setup-label').textContent    = `${setupDone} / ${setupTotal}`;
+  document.getElementById('sys-portfolio-bar').style.width  = portfolioPct + '%';
+  document.getElementById('sys-portfolio-label').textContent= `${portfolioBuilt} / 36`;
+  document.getElementById('sys-big-pct').textContent  = overallPct + '%';
+  document.getElementById('stat-system').textContent  = overallPct + '%';
+  const msg = document.getElementById('sys-message');
+  if (overallPct === 100) { msg.style.color = 'var(--green)';  msg.textContent = '✅ System is 100% ready. If no clients yet — purely outreach volume. Keep DMing.'; }
+  else if (overallPct >= 70) { msg.style.color = 'var(--accent)';  msg.textContent = `⚡ System is ${overallPct}% ready. Almost there.`; }
+  else if (overallPct >= 30) { msg.style.color = 'var(--accent2)'; msg.textContent = `🔧 System is ${overallPct}% ready. Keep building.`; }
+  else { msg.style.color = 'var(--muted)'; msg.textContent = 'System not ready yet — complete setup tasks and build portfolio websites.'; }
+}
+
+// ── TOOLS ──────────────────────────────────────────────
+const toolsData = {
+  builders:[
+    {icon:'🤖',name:'Bolt.new',desc:'AI builder, free tokens',url:'https://bolt.new',color:'#1a1a2e'},
+    {icon:'🎨',name:'Carrd.co',desc:'Unlimited free sites',url:'https://carrd.co',color:'#1a2e1a'},
+    {icon:'⚡',name:'Framer.com',desc:'Beautiful, free publish',url:'https://framer.com',color:'#2e1a1a'},
+    {icon:'🌊',name:'Webflow.com',desc:'Professional, free tier',url:'https://webflow.com',color:'#1a1e2e'},
+    {icon:'💫',name:'v0.dev',desc:'AI UI generator',url:'https://v0.dev',color:'#2e2a1a'},
+    {icon:'🚀',name:'Typedream',desc:'Simple & free',url:'https://typedream.com',color:'#2a1a2e'},
+  ],
+  hosting:[
+    {icon:'🐙',name:'GitHub Pages',desc:'Free forever',url:'https://pages.github.com',color:'#1a1a1a'},
+    {icon:'🌐',name:'Netlify',desc:'Drag & drop deploy',url:'https://netlify.com',color:'#1a2e2a'},
+    {icon:'▲',name:'Vercel',desc:'Fast & free',url:'https://vercel.com',color:'#1a1a1a'},
+  ],
+  payment:[
+    {icon:'💳',name:'Payoneer',desc:'Main — US bank account',url:'https://payoneer.com',color:'#2e1e1a'},
+    {icon:'₿',name:'Binance P2P',desc:'Backup — crypto to BDT',url:'https://binance.com',color:'#2e2a1a'},
+    {icon:'🏦',name:'City Bank BD',desc:'Your withdrawal bank',url:'#',color:'#1a2a2e'},
+  ]
+};
+function renderTools() {
+  ['builders','hosting','payment'].forEach(cat => {
+    document.getElementById('tools-' + cat).innerHTML = toolsData[cat].map(t => `
+      <a href="${t.url}" target="_blank" class="tool-card">
+        <div class="tool-icon" style="background:${t.color}">${t.icon}</div>
+        <div><div class="tool-name">${t.name}</div><div class="tool-desc">${t.desc}</div></div>
+      </a>`).join('');
+  });
+}
+
+// ── FOLLOW-UP LOGIC ────────────────────────────────────
+function getDaysAgo(dateStr) {
+  if (!dateStr) return 999;
+  return Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
+}
+function getFollowUpStatus(c) {
+  if (!c.date) return null;
+  const days = getDaysAgo(c.date);
+  const msgCount = c.msgCount || 1;
+  if (msgCount >= 3) return null;
+  if (['closed','rejected','dead'].includes(c.status)) return null;
+  if (!c.seen && days >= 7)               return { type:'unseen', label:"📬 Didn't see — send again",   days };
+  if (c.seen && !c.replied && days >= 14) return { type:'seen',   label:'👀 Saw it — no reply yet',     days };
+  if (!c.seen && days >= 28)              return { type:'unseen', label:'📬 Last chance — still unseen', days };
+  return null;
+}
+
+// ── CRM ────────────────────────────────────────────────
+let editingContactId = null;
+
+function openModal(editId) {
+  editingContactId = editId || null;
+  document.getElementById('modal').classList.add('open');
+  populateMsgSelector(null, 0);
+  if (editId) {
+    const c = contacts.find(x => x.id === editId); if (!c) return;
+    document.getElementById('modal-title').textContent  = 'Update Contact';
+    document.getElementById('f-name').value    = c.name;
+    document.getElementById('f-country').value = c.country;
+    document.getElementById('f-contact').value = c.contact || '';
+    document.getElementById('f-status').value  = c.status;
+    document.getElementById('f-notes').value   = c.notes || '';
+    document.getElementById('f-seen').checked    = !!c.seen;
+    document.getElementById('f-replied').checked = !!c.replied;
+    document.getElementById('f-date').value = c.date || '';
+    populateMsgSelector(c.msgId, c.msgCount || 1);
+  } else {
+    document.getElementById('modal-title').textContent = 'Add New Contact';
+    ['f-name','f-contact','f-notes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('f-seen').checked = false;
+    document.getElementById('f-replied').checked = false;
+    document.getElementById('f-date').valueAsDate = new Date();
+    document.getElementById('f-status').value = 'called';
+  }
+}
+
+function populateMsgSelector(selectedId, msgCount) {
+  const container = document.getElementById('f-msg-selector');
+  if (!abMessages.length) {
+    container.innerHTML = '<div style="font-size:11px;color:var(--muted);font-family:\'DM Mono\',monospace;padding:8px;">No message versions yet — add them in A/B Testing tab first.</div>';
+    return;
+  }
+  container.innerHTML = abMessages.map(m => {
+    const seenPct    = m.sent ? Math.round((m.seen||0)/m.sent*100) : 0;
+    const repPct     = m.sent ? Math.round((m.replied||0)/m.sent*100) : 0;
+    const isSelected = selectedId == m.id;
+    return `
+    <label style="display:block;padding:9px 12px;background:var(--surface2);border:1px solid ${isSelected?'var(--accent)':'var(--border)'};border-radius:7px;cursor:pointer;transition:border-color 0.15s;" onclick="checkSameMsg('${m.id}','${selectedId}')">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <input type="radio" name="msg-select" value="${m.id}" ${isSelected?'checked':''} style="accent-color:var(--accent);flex-shrink:0;">
+        <span style="font-size:12px;font-weight:700;">${m.title}</span>
+        <span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;">${m.platform}</span>
+        <span style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);">Sent <b style="color:var(--text);">${m.sent||0}</b></span>
+        <span style="font-size:10px;font-family:'DM Mono',monospace;color:${getPctColor(seenPct)};">Seen ${seenPct}%</span>
+        <span style="font-size:10px;font-family:'DM Mono',monospace;color:${getPctColor(repPct)};">Reply ${repPct}%</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:20px;">${m.body}</div>
+    </label>`;
+  }).join('');
+}
+
+function checkSameMsg(newId, prevId) {
+  const warning = document.getElementById('f-msg-warning');
+  if (editingContactId && newId === prevId) { warning.style.display = 'block'; }
+  else { warning.style.display = 'none'; }
+}
+
+function getSelectedMsgId() {
+  const radios = document.querySelectorAll('input[name="msg-select"]');
+  for (const r of radios) { if (r.checked) return r.value; }
+  return null;
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.getElementById('f-msg-warning').style.display = 'none';
+  editingContactId = null;
+}
+
+function saveContact() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('Please enter a business name'); return; }
+  const msgId   = getSelectedMsgId();
+  const seen    = document.getElementById('f-seen').checked;
+  const replied = document.getElementById('f-replied').checked;
+
+  if (editingContactId) {
+    const c = contacts.find(x => x.id === editingContactId); if (!c) return;
+    const prevMsgId = c.msgId;
+    if (msgId && msgId !== prevMsgId) {
+      c.msgCount = (c.msgCount || 1) + 1;
+      const msg = abMessages.find(m => m.id === msgId);
+      if (msg) { msg.sent = (msg.sent || 0) + 1; saveABMessages(); }
+    }
+    c.name    = name;
+    c.country = document.getElementById('f-country').value;
+    c.contact = document.getElementById('f-contact').value;
+    c.status  = document.getElementById('f-status').value;
+    c.notes   = document.getElementById('f-notes').value;
+    c.date    = document.getElementById('f-date').value;
+    c.msgId   = msgId || c.msgId;
+    c.seen    = seen;
+    c.replied = replied;
+  } else {
+    const newContact = {
+      id: Date.now(), name,
+      country:  document.getElementById('f-country').value,
+      contact:  document.getElementById('f-contact').value,
+      status:   document.getElementById('f-status').value,
+      notes:    document.getElementById('f-notes').value,
+      date:     document.getElementById('f-date').value,
+      msgId:    msgId || null, msgCount: 1, seen, replied,
+    };
+    contacts.push(newContact);
+    if (msgId) { const msg = abMessages.find(m => m.id === msgId); if (msg) { msg.sent = (msg.sent||0)+1; saveABMessages(); } }
+  }
+  localStorage.setItem('crm', JSON.stringify(contacts));
+  closeModal(); renderCRM(contacts); renderABCards(); renderClients(); updateStats();
+}
+
+function deleteContact(id) {
+  contacts = contacts.filter(c => c.id !== id);
+  localStorage.setItem('crm', JSON.stringify(contacts));
+  renderCRM(contacts); updateStats();
+}
+
+function renderCRM(data) {
+  const tbody = document.getElementById('crm-tbody');
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><span class="emoji">📭</span>No contacts yet.</div></td></tr>';
+    renderFollowUps(); return;
+  }
+  const sorted = [...data].sort((a, b) => { const fa=getFollowUpStatus(a), fb=getFollowUpStatus(b); return (fa&&!fb)?-1:(!fa&&fb)?1:0; });
+  tbody.innerHTML = sorted.map((c, i) => {
+    const fu  = getFollowUpStatus(c);
+    const msg = abMessages.find(m => m.id === c.msgId);
+    const msgLabel  = msg ? `<span style="font-size:10px;font-family:'DM Mono',monospace;color:var(--blue);">${msg.title}</span>` : '<span style="color:var(--muted);font-size:10px;">—</span>';
+    const fuBadge   = fu  ? `<br><span class="followup-banner followup-${fu.type}" style="padding:3px 8px;font-size:10px;display:inline-block;margin-top:4px;">${fu.label}</span>` : '';
+    const daysAgo   = getDaysAgo(c.date);
+    const dueText   = fu ? `<span style="color:var(--red);font-size:10px;font-family:'DM Mono',monospace;">${fu.days}d ago</span>` : `<span style="color:var(--muted);font-size:10px;font-family:'DM Mono',monospace;">${daysAgo}d</span>`;
+    const seenDot   = c.seen    ? '<span title="Seen" style="color:var(--accent);">👁</span> '  : '';
+    const replyDot  = c.replied ? '<span title="Replied" style="color:var(--green);">💬</span>' : '';
+    return `<tr style="${fu?'background:rgba(255,77,77,0.04);':''}">
+      <td style="color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;">${i+1}</td>
+      <td style="font-weight:600;">${c.name}${fuBadge}</td>
+      <td style="font-size:12px;">${c.country}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">${c.contact||'—'}</td>
+      <td>${msgLabel}</td>
+      <td><span class="msg-count-badge">${c.msgCount||1}x</span> ${seenDot}${replyDot}</td>
+      <td><span class="status-badge status-${c.status}">${c.status}</span></td>
+      <td>${dueText}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">${c.date||'—'}</td>
+      <td style="display:flex;gap:4px;align-items:center;">
+        <button class="ab-action-btn" onclick="openModal(${c.id})">Edit</button>
+        <button class="btn btn-danger" onclick="deleteContact(${c.id})">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+  renderFollowUps();
+}
+
+function renderFollowUps() {
+  const section = document.getElementById('followup-due-section');
+  const due = contacts.filter(c => getFollowUpStatus(c));
+  if (!due.length) { section.innerHTML = ''; return; }
+  section.innerHTML = `<div style="margin-bottom:16px;">
+    <div class="section-title">🔔 Follow-Up Due (${due.length})</div>
+    ${due.map(c => { const fu=getFollowUpStatus(c); return `
+      <div class="followup-banner followup-${fu.type}" style="margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+        <strong>${c.name}</strong> — ${fu.label} (${fu.days} days since last)
+        <button onclick="openModal(${c.id})" class="ab-action-btn" style="margin-left:auto;">Update</button>
+      </div>`; }).join('')}
+  </div>`;
+}
+
+function filterCRM(val) { renderCRM(contacts.filter(c => c.name.toLowerCase().includes(val.toLowerCase()))); }
+function filterByStatus(val) { renderCRM(val ? contacts.filter(c => c.status===val) : contacts); }
+
+// ── STATS ──────────────────────────────────────────────
+function updateStats() {
+  const total      = contacts.length;
+  const interested = contacts.filter(c => ['interested','closed'].includes(c.status)).length;
+  const closed     = contacts.filter(c => c.status==='closed').length;
+  const rate       = total ? Math.round((closed/total)*100) : 0;
+  const progress   = Math.min(Math.round((total/800)*100), 100);
+  document.getElementById('stat-total').textContent      = total;
+  document.getElementById('stat-interested').textContent = interested;
+  document.getElementById('stat-closed').textContent     = closed;
+  document.getElementById('stat-rate').textContent       = rate + '%';
+  document.getElementById('prog-label').textContent      = total + ' / 800';
+  document.getElementById('prog-bar').style.width        = progress + '%';
+  document.getElementById('sb-total').textContent        = total;
+  document.getElementById('sb-closed').textContent       = closed;
+  document.getElementById('sb-rate').textContent         = rate + '%';
+  updateSystemProgress();
+}
+
+// ── A/B TESTING ────────────────────────────────────────
+function saveABMessages() { localStorage.setItem('abMessages', JSON.stringify(abMessages)); }
+
+function getPctColor(pct) {
+  if (pct >= 70) return 'var(--green)';
+  if (pct >= 40) return 'var(--accent)';
+  if (pct >= 20) return 'var(--accent2)';
+  return 'var(--red)';
+}
+
+function renderABCards() {
+  const container = document.getElementById('ab-cards-container');
+  if (!abMessages.length) {
+    container.innerHTML = '<div class="empty-state"><span class="emoji">🧪</span>No message versions yet. Click "+ Add Message" to start.</div>';
+    return;
+  }
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const colors  = ['#c8f135','#4da6ff','#f1a335','#4dff91','#ff4d4d','#b44dff'];
+  const crmStats = (id) => {
+    const c2 = contacts.filter(c => c.msgId===id);
+    return { sent:c2.length, seen:c2.filter(c=>c.seen).length, replied:c2.filter(c=>c.replied).length };
+  };
+  container.innerHTML = '<div class="ab-cards">' + abMessages.map((m, idx) => {
+    const s = crmStats(m.id);
+    const seenPct  = s.sent ? Math.round((s.seen/s.sent)*100)    : 0;
+    const repPct   = s.sent ? Math.round((s.replied/s.sent)*100) : 0;
+    const stClass  = m.status==='active'?'active-msg':m.status==='winner'?'winner-msg':m.status==='retired'?'retired-msg':'';
+    const stTag    = m.status||'testing';
+    const color    = colors[idx % colors.length];
+    return `<div class="ab-card ${stClass}">
+      <div class="ab-card-header">
+        <div class="ab-version-badge" style="background:${color}22;color:${color};">${letters[idx]||idx+1}</div>
+        <div class="ab-card-title">${m.title}</div>
+        <span class="ab-status-tag ab-status-${stTag}">${stTag}</span>
+      </div>
+      <div class="ab-card-body">
+        <div class="ab-message-preview">${m.body}</div>
+        <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:10px;">Platform: ${m.platform}</div>
+        <div class="ab-stats">
+          <div class="ab-stat"><div class="ab-stat-val" style="color:${color};">${s.sent}</div><div class="ab-stat-label">Sent</div></div>
+          <div class="ab-stat"><div class="ab-stat-val" style="color:${color};">${s.seen}</div><div class="ab-stat-label">Seen</div></div>
+          <div class="ab-stat"><div class="ab-stat-val" style="color:${color};">${s.replied}</div><div class="ab-stat-label">Replied</div></div>
+        </div>
+        <div class="ab-pct-bar">
+          <div class="ab-pct-row"><span>Seen Rate</span><span class="ab-pct-val" style="color:${getPctColor(seenPct)};">${seenPct}%</span></div>
+          <div class="ab-bar"><div class="ab-bar-fill" style="width:${seenPct}%;background:${getPctColor(seenPct)};"></div></div>
+        </div>
+        <div class="ab-pct-bar">
+          <div class="ab-pct-row"><span>Reply Rate</span><span class="ab-pct-val" style="color:${getPctColor(repPct)};">${repPct}%</span></div>
+          <div class="ab-bar"><div class="ab-bar-fill" style="width:${repPct}%;background:${getPctColor(repPct)};"></div></div>
+        </div>
+        <div class="ab-card-actions">
+          <button class="ab-action-btn set-active"  onclick="setABStatus(${idx},'active')">Set Active</button>
+          <button class="ab-action-btn set-winner"  onclick="setABStatus(${idx},'winner')">Winner 🏆</button>
+          <button class="ab-action-btn retire"      onclick="setABStatus(${idx},'retired')">Retire</button>
+          <button class="ab-action-btn" onclick="deleteABMessage(${idx})" style="margin-left:auto;border-color:var(--red);color:var(--red);">Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('') + '</div>';
+}
+
+function setABStatus(idx, status) { abMessages[idx].status = status; saveABMessages(); renderABCards(); }
+function deleteABMessage(idx) {
+  if (!confirm('Delete this message version?')) return;
+  abMessages.splice(idx,1); saveABMessages(); renderABCards();
+}
+function openABModal()  { document.getElementById('ab-modal').classList.add('open'); }
+function closeABModal() {
+  document.getElementById('ab-modal').classList.remove('open');
+  document.getElementById('ab-title').value = '';
+  document.getElementById('ab-body').value  = '';
+}
+function saveABMessage() {
+  const title = document.getElementById('ab-title').value.trim();
+  const body  = document.getElementById('ab-body').value.trim();
+  if (!title||!body) { alert('Please fill in title and message'); return; }
+  abMessages.push({ id:Date.now(), title, body, platform:document.getElementById('ab-platform').value, status:'testing' });
+  saveABMessages(); closeABModal(); renderABCards();
+}
+
+// ── PORTFOLIO ──────────────────────────────────────────
+const nichesData = [
+  {id:'ev',       icon:'⚡', name:'EV Charger',             templates:['Standard Station','Home Install','Commercial Fleet']},
+  {id:'counselor',icon:'🧠', name:'Counselor / Therapist',  templates:['Mental Health','Couples Therapy','Online Sessions']},
+  {id:'realestate',icon:'🏠',name:'Real Estate',             templates:['Luxury Agent','Local Realtor','Property Listings']},
+  {id:'tattoo',   icon:'🎨', name:'Tattoo Studio',           templates:['Dark & Bold','Fine Line Art','Color Specialist']},
+  {id:'animal',   icon:'🐾', name:'Animal Shelter / Pet',    templates:['Shelter Adoption','Pet Store','Grooming Service']},
+  {id:'plumbing', icon:'🔧', name:'Plumbing',                templates:['Emergency Plumber','Full Service','Commercial']},
+  {id:'driving',  icon:'🚗', name:'Driving School',          templates:['Standard Classes','Teen Driver','Online Booking']},
+  {id:'trainer',  icon:'💪', name:'Personal Trainer',        templates:['Gym Trainer','Online Coach','Nutrition + Fitness']},
+  {id:'solar',    icon:'☀️', name:'Solar Energy',            templates:['Residential Solar','Commercial Solar','Solar + Battery']},
+  {id:'foodtruck',icon:'🍔', name:'Food Truck',              templates:['Menu Focus','Location Tracker','Events & Catering']},
+  {id:'medspa',   icon:'💆', name:'Med Spa',                 templates:['Luxury Spa','Skin Clinic','Anti-Aging Center']},
+  {id:'cleaning', icon:'🧹', name:'Cleaning Service',        templates:['Home Cleaning','Commercial Clean','Deep Clean Specialist']},
+];
+let portfolioData = JSON.parse(localStorage.getItem('portfolio') || '{}');
+function savePortfolio() { localStorage.setItem('portfolio', JSON.stringify(portfolioData)); }
+function getTemplateKey(nicheId, tIdx) { return `${nicheId}_t${tIdx}`; }
+function toggleTemplate(nicheId, tIdx) {
+  const key = getTemplateKey(nicheId, tIdx);
+  if (!portfolioData[key]) portfolioData[key] = {};
+  portfolioData[key].built = !portfolioData[key].built;
+  savePortfolio(); renderPortfolio(); updatePortfolioStats();
+}
+function saveLink(nicheId, tIdx, val) {
+  const key = getTemplateKey(nicheId, tIdx);
+  if (!portfolioData[key]) portfolioData[key] = {};
+  portfolioData[key].link = val.trim(); savePortfolio(); updatePortfolioStats();
+  const btn = document.getElementById(`lbtn-${nicheId}-${tIdx}`);
+  if (btn) { if (val.trim()) { btn.classList.remove('disabled'); btn.href=val.trim(); } else { btn.classList.add('disabled'); btn.href='#'; } }
+}
+function renderPortfolio() {
+  const grid = document.getElementById('niche-grid');
+  grid.innerHTML = nichesData.map(niche => {
+    const builtCount = niche.templates.filter((_,i) => portfolioData[getTemplateKey(niche.id,i)]?.built).length;
+    return `<div class="niche-card">
+      <div class="niche-card-header">
+        <span class="niche-icon">${niche.icon}</span>
+        <span class="niche-name">${niche.name}</span>
+        <span class="niche-progress-badge ${builtCount===3?'done':''}">${builtCount}/3</span>
+      </div>
+      <div class="niche-card-body">
+        ${niche.templates.map((tpl,i) => {
+          const data = portfolioData[getTemplateKey(niche.id,i)]||{};
+          const isBuilt=!!data.built, link=data.link||'';
+          return `<div class="template-row">
+            <div class="template-check ${isBuilt?'checked':''}" onclick="toggleTemplate('${niche.id}',${i})">${isBuilt?'✓':''}</div>
+            <span class="template-label ${isBuilt?'done':''}">${tpl}</span>
+            <input class="template-link-input" placeholder="netlify link..." value="${link}" onchange="saveLink('${niche.id}',${i},this.value)" onblur="saveLink('${niche.id}',${i},this.value)">
+            <a id="lbtn-${niche.id}-${i}" href="${link||'#'}" target="_blank" class="template-link-btn ${link?'':'disabled'}">🔗</a>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  updatePortfolioStats();
+}
+function updatePortfolioStats() {
+  let built=0, live=0;
+  nichesData.forEach(n => n.templates.forEach((_,i) => { const d=portfolioData[getTemplateKey(n.id,i)]||{}; if(d.built)built++; if(d.link)live++; }));
+  const pct = Math.round((built/36)*100);
+  document.getElementById('pt-built').textContent      = built;
+  document.getElementById('pt-live').textContent       = live;
+  document.getElementById('pt-remaining').textContent  = 36-built;
+  document.getElementById('pt-percent').textContent    = pct+'%';
+  document.getElementById('pt-prog-label').textContent = built+' / 36';
+  document.getElementById('pt-prog-bar').style.width   = pct+'%';
+  updateSystemProgress();
+}
+
+// ── NOTES ──────────────────────────────────────────────
+let currentNoteId=null, saveTimeout=null;
+function newNote() {
+  const note={id:Date.now(),title:'Untitled Note',body:'',date:new Date().toLocaleDateString()};
+  notes.unshift(note); saveNotes(); renderNotesList(); openNote(note.id);
+}
+function openNote(id) {
+  currentNoteId=id; const note=notes.find(n=>n.id===id); if(!note) return;
+  document.getElementById('editor-empty').style.display='none';
+  document.getElementById('editor-main').style.display='flex';
+  document.getElementById('editor-title').value=note.title;
+  document.getElementById('editor-body').innerHTML=note.body;
+  updateStatusBar();
+  document.querySelectorAll('.note-list-item').forEach(el=>el.classList.remove('active'));
+  const item=document.querySelector(`[data-note-id="${id}"]`); if(item) item.classList.add('active');
+  document.getElementById('editor-body').focus();
+}
+function saveCurrentNote() {
+  if(!currentNoteId) return; const note=notes.find(n=>n.id===currentNoteId); if(!note) return;
+  note.title=document.getElementById('editor-title').value||'Untitled Note';
+  note.body=document.getElementById('editor-body').innerHTML;
+  note.date=new Date().toLocaleDateString();
+  clearTimeout(saveTimeout);
+  saveTimeout=setTimeout(()=>{ saveNotes(); renderNotesList(); document.getElementById('editor-saved').textContent='✓ Saved'; },600);
+}
+function deleteNote(id) {
+  if(!confirm('Delete this note?')) return;
+  notes=notes.filter(n=>n.id!==id); saveNotes();
+  if(currentNoteId===id){ currentNoteId=null; document.getElementById('editor-empty').style.display='flex'; document.getElementById('editor-main').style.display='none'; }
+  renderNotesList();
+}
+function saveNotes() { localStorage.setItem('notes',JSON.stringify(notes)); }
+function renderNotesList() {
+  const container=document.getElementById('notes-list-items');
+  if(!notes.length){ container.innerHTML='<div class="notes-empty" style="padding:40px 20px;text-align:center;"><div class="emoji">📝</div><div>No notes yet</div></div>'; return; }
+  container.innerHTML=notes.map(n=>{
+    const preview=n.body.replace(/<[^>]*>/g,'').substring(0,50);
+    return `<div class="note-list-item ${n.id===currentNoteId?'active':''}" data-note-id="${n.id}" onclick="openNote(${n.id})">
+      <button class="note-list-del" onclick="event.stopPropagation();deleteNote(${n.id})">✕</button>
+      <div class="note-list-title">${n.title}</div>
+      <div class="note-list-preview">${preview||'Empty note...'}</div>
+      <div class="note-list-date">${n.date}</div>
+    </div>`;
+  }).join('');
+}
+function renderNotes() { renderNotesList(); }
+function execCmd(cmd,val=null){ document.getElementById('editor-body').focus(); document.execCommand(cmd,false,val); saveCurrentNote(); }
+function applyHeading(tag){ if(!tag) return; document.getElementById('editor-body').focus(); document.execCommand('formatBlock',false,tag); saveCurrentNote(); }
+function insertHR(){ document.getElementById('editor-body').focus(); document.execCommand('insertHTML',false,'<hr style="border:none;border-top:1px solid #2a2a2a;margin:12px 0;">'); saveCurrentNote(); }
+function insertLink(){ const url=prompt('Enter URL:'); if(url) execCmd('createLink',url); }
+function insertCode(){ document.getElementById('editor-body').focus(); document.execCommand('insertHTML',false,'<code style="background:#1e1e1e;padding:2px 6px;border-radius:4px;font-family:monospace;">code here</code>'); saveCurrentNote(); }
+function insertTable(){
+  const rows=parseInt(prompt('Rows:','3'))||3,cols=parseInt(prompt('Columns:','3'))||3;
+  let t='<table style="border-collapse:collapse;width:100%;margin:10px 0;">';
+  for(let r=0;r<rows;r++){t+='<tr>';for(let c=0;c<cols;c++){const tag=r===0?'th':'td';t+=`<${tag} style="border:1px solid #2a2a2a;padding:6px 10px;${r===0?'background:#161616;':''}">${r===0?'Header':'Cell'}</${tag}>`;}t+='</tr>';}
+  t+='</table>'; document.getElementById('editor-body').focus(); document.execCommand('insertHTML',false,t); saveCurrentNote();
+}
+function updateStatusBar(){
+  const body=document.getElementById('editor-body'); if(!body) return;
+  const text=body.innerText||''; const words=text.trim()?text.trim().split(/\s+/).length:0;
+  document.getElementById('editor-words').textContent=words+' words';
+  document.getElementById('editor-chars').textContent=text.length+' chars';
+}
+
+// ── CLIENTS TAB ────────────────────────────────────────
+let clientProfiles = JSON.parse(localStorage.getItem('clientProfiles') || '{}');
+let activeClientId = null;
+
+const defaultGuideSteps = [
+  { text: 'Send invoice / payment confirmation', priority: 'urgent' },
+  { text: 'Collect remaining 50% balance', priority: 'urgent' },
+  { text: 'Connect domain to Netlify (if needed)', priority: 'urgent' },
+  { text: 'Deliver final website link to client', priority: 'urgent' },
+  { text: 'Ask for a written testimonial or review', priority: 'normal' },
+  { text: 'Ask if they know anyone else who needs a website', priority: 'normal' },
+  { text: 'Send a thank you message', priority: 'normal' },
+  { text: 'Log client on portfolio if they approve', priority: 'low' },
+  { text: 'Follow up in 30 days — offer maintenance/updates', priority: 'low' },
+];
+
+let guideSteps = JSON.parse(localStorage.getItem('guideSteps') || JSON.stringify(defaultGuideSteps));
+function saveGuideSteps() { localStorage.setItem('guideSteps', JSON.stringify(guideSteps)); }
+function saveClientProfiles() { localStorage.setItem('clientProfiles', JSON.stringify(clientProfiles)); }
+
+function syncClientsFromCRM() {
+  contacts.filter(c => c.status === 'closed').forEach(c => {
+    if (!clientProfiles[c.id]) {
+      clientProfiles[c.id] = {
+        contactId: c.id,
+        steps: guideSteps.map((s, i) => ({ id: i, text: s.text, priority: s.priority, done: false })),
+        notes: '',
+      };
+    }
+  });
+  // Remove any that are no longer closed
+  Object.keys(clientProfiles).forEach(id => {
+    const c = contacts.find(x => x.id == id);
+    if (!c || c.status !== 'closed') delete clientProfiles[id];
+  });
+  saveClientProfiles();
+}
+
+function renderClients() {
+  syncClientsFromCRM();
+  const grid  = document.getElementById('clients-grid');
+  const empty = document.getElementById('clients-empty');
+  const closedContacts = contacts.filter(c => c.status === 'closed');
+  if (!closedContacts.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = closedContacts.map(c => {
+    const profile = clientProfiles[c.id] || {};
+    const steps   = profile.steps || [];
+    const done    = steps.filter(s => s.done).length;
+    const initials = c.name.split(' ').map(w => w[0]).join('').toUpperCase().substring(0,2);
+    const msg     = abMessages.find(m => m.id === c.msgId);
+    return `<div class="client-card" onclick="openClientProfile(${c.id})">
+      <div class="client-card-top">
+        <div class="client-avatar">${initials}</div>
+        <div>
+          <div class="client-name">${c.name}</div>
+          <div class="client-country">${c.country}</div>
+        </div>
+        <span class="closed-badge">💰 Closed</span>
+      </div>
+      <div class="client-card-body">
+        <div class="client-meta-row">
+          ${c.contact ? `<span class="client-meta-tag">📱 ${c.contact}</span>` : ''}
+          ${msg ? `<span class="client-meta-tag">✉️ ${msg.title}</span>` : ''}
+          ${c.date ? `<span class="client-meta-tag">📅 ${c.date}</span>` : ''}
+        </div>
+        <div class="client-steps-preview">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;">
+            <span>Action Steps</span>
+            <span style="color:${done===steps.length&&steps.length>0?'var(--green)':'var(--accent)'};">${done}/${steps.length} done</span>
+          </div>
+          ${steps.slice(0,3).map((s,i) => `
+            <div class="step-mini-row">
+              <div class="step-mini-check ${s.done?'done':''}" onclick="event.stopPropagation();quickToggleStep(${c.id},${i})">${s.done?'✓':''}</div>
+              <span class="step-mini-text ${s.done?'done':''}">${s.text}</span>
+            </div>`).join('')}
+          ${steps.length > 3 ? `<div style="font-size:10px;color:var(--muted);margin-top:4px;">+${steps.length-3} more steps</div>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function quickToggleStep(clientId, stepIdx) {
+  if (!clientProfiles[clientId]) return;
+  clientProfiles[clientId].steps[stepIdx].done = !clientProfiles[clientId].steps[stepIdx].done;
+  saveClientProfiles(); renderClients();
+}
+
+function openClientProfile(clientId) {
+  syncClientsFromCRM();
+  activeClientId = clientId;
+  const c       = contacts.find(x => x.id === clientId); if (!c) return;
+  const profile = clientProfiles[clientId] || {};
+  const steps   = profile.steps || [];
+  const initials = c.name.split(' ').map(w=>w[0]).join('').toUpperCase().substring(0,2);
+  const msg     = abMessages.find(m => m.id === c.msgId);
+
+  document.getElementById('cp-avatar').textContent = initials;
+  document.getElementById('cp-name').textContent   = c.name;
+  document.getElementById('cp-sub').textContent    = `${c.country} · Closed ${c.date||''}`;
+  document.getElementById('cp-notes').value        = profile.notes || '';
+
+  document.getElementById('cp-info-grid').innerHTML = [
+    { label:'Contact', val: c.contact || '—' },
+    { label:'Date Closed', val: c.date || '—' },
+    { label:'Country', val: c.country },
+    { label:'Message Used', val: msg ? msg.title : '—' },
+    { label:'Total Messages', val: (c.msgCount||1) + 'x' },
+    { label:'Status', val: '💰 Closed' },
+  ].map(item => `<div class="client-info-item">
+    <div class="client-info-label">${item.label}</div>
+    <div class="client-info-val">${item.val}</div>
+  </div>`).join('');
+
+  renderProfileSteps(steps);
+  document.getElementById('client-profile-overlay').classList.add('open');
+}
+
+function renderProfileSteps(steps) {
+  const container = document.getElementById('cp-steps-list');
+  if (!steps.length) { container.innerHTML = '<div style="color:var(--muted);font-size:12px;font-family:\'DM Mono\',monospace;padding:10px 0;">No steps yet. Click "+ Add Step" to add.</div>'; return; }
+  const priorityColors = { urgent:'priority-urgent', normal:'priority-normal', low:'priority-low' };
+  container.innerHTML = steps.map((s,i) => `
+    <div class="step-row">
+      <div class="step-check ${s.done?'done':''}" onclick="toggleProfileStep(${i})">${s.done?'✓':''}</div>
+      <span class="step-text ${s.done?'done':''}">${s.text}</span>
+      <span class="step-priority ${priorityColors[s.priority]||'priority-normal'}">${s.priority}</span>
+      <button class="del-step-btn" onclick="deleteProfileStep(${i})">✕</button>
+    </div>`).join('');
+}
+
+function toggleProfileStep(i) {
+  if (!clientProfiles[activeClientId]) return;
+  clientProfiles[activeClientId].steps[i].done = !clientProfiles[activeClientId].steps[i].done;
+  saveClientProfiles();
+  renderProfileSteps(clientProfiles[activeClientId].steps);
+  renderClients();
+}
+
+function deleteProfileStep(i) {
+  if (!clientProfiles[activeClientId]) return;
+  clientProfiles[activeClientId].steps.splice(i,1);
+  saveClientProfiles();
+  renderProfileSteps(clientProfiles[activeClientId].steps);
+  renderClients();
+}
+
+function saveClientNotes() {
+  if (!clientProfiles[activeClientId]) return;
+  clientProfiles[activeClientId].notes = document.getElementById('cp-notes').value;
+  saveClientProfiles();
+}
+
+function closeClientProfile() {
+  document.getElementById('client-profile-overlay').classList.remove('open');
+  activeClientId = null;
+}
+
+// ADD STEP popup
+function openAddStep() { document.getElementById('step-popup-overlay').classList.add('open'); document.getElementById('step-input').value=''; }
+function closeAddStep() { document.getElementById('step-popup-overlay').classList.remove('open'); }
+function saveNewStep() {
+  const text = document.getElementById('step-input').value.trim();
+  if (!text || !activeClientId) return;
+  const priority = document.getElementById('step-priority').value;
+  if (!clientProfiles[activeClientId]) clientProfiles[activeClientId] = { steps:[], notes:'' };
+  const steps = clientProfiles[activeClientId].steps;
+  steps.push({ id: Date.now(), text, priority, done:false });
+  saveClientProfiles();
+  renderProfileSteps(steps);
+  renderClients();
+  closeAddStep();
+}
+
+// STEPS GUIDE popup
+function openStepsGuide() {
+  renderStepsGuide();
+  document.getElementById('steps-guide-overlay').classList.add('open');
+}
+function closeStepsGuide() { document.getElementById('steps-guide-overlay').classList.remove('open'); }
+function renderStepsGuide() {
+  document.getElementById('steps-guide-list').innerHTML = guideSteps.map((s,i) => `
+    <div class="step-row" style="margin-bottom:6px;">
+      <span class="step-text">${s.text}</span>
+      <span class="step-priority priority-${s.priority}">${s.priority}</span>
+      <button class="del-step-btn" onclick="deleteGuideStep(${i})" style="color:var(--muted);">✕</button>
+    </div>`).join('');
+}
+function deleteGuideStep(i) { guideSteps.splice(i,1); saveGuideSteps(); renderStepsGuide(); }
+function addGuideStep() {
+  const input = document.getElementById('guide-step-input');
+  const text  = input.value.trim(); if (!text) return;
+  guideSteps.push({ text, priority:'normal' });
+  saveGuideSteps(); renderStepsGuide(); input.value = '';
+}
+
+// ── MODAL OVERLAY CLOSE ────────────────────────────────
+document.getElementById('modal').addEventListener('click',    function(e){ if(e.target===this) closeModal(); });
+document.getElementById('ab-modal').addEventListener('click', function(e){ if(e.target===this) closeABModal(); });
+document.getElementById('client-profile-overlay').addEventListener('click', function(e){ if(e.target===this) closeClientProfile(); });
+document.getElementById('step-popup-overlay').addEventListener('click',     function(e){ if(e.target===this) closeAddStep(); });
+document.getElementById('steps-guide-overlay').addEventListener('click',    function(e){ if(e.target===this) closeStepsGuide(); });
+
+init();
+renderPortfolio();
+</script>
+</body>
+</html>
